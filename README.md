@@ -60,23 +60,73 @@ uptime-monitor/
 ## 🖥 1. Local Development
 
 ### 1.1. Clone the repository
-```bash
+# Uptime Monitor
+
+Uptime Monitor is a lightweight service for monitoring website availability and performance. It records uptime metrics, exposes health checks, and provides Prometheus-compatible metrics for monitoring dashboards.
+
+---
+
+## Table of Contents
+
+- [Features](#features)
+- [Prerequisites](#prerequisites)
+- [Local Setup](#local-setup)
+  - [Without Docker](#without-docker)
+  - [With Docker Compose](#with-docker-compose)
+- [AWS Deployment with Terraform](#aws-deployment-with-terraform)
+  - [Initialize Terraform](#initialize-terraform)
+  - [Create Infrastructure](#create-infrastructure)
+- [Build and Push Docker Image to ECR](#build-and-push-docker-image-to-ecr)
+  - [Authenticate to ECR](#authenticate-to-ecr)
+  - [Build and Push](#build-and-push)
+- [CI/CD with GitHub Actions](#cicd-with-github-actions)
+- [Updating the Application](#updating-the-application)
+- [Destroying Infrastructure](#destroying-infrastructure)
+- [Recommended Extensions](#recommended-extensions)
+
+---
+
+## Features
+
+- Monitor multiple URLs with configurable intervals  
+- Store check results in SQLite (or replace with RDS)  
+- Expose metrics for Prometheus  
+- Health check endpoint (`/healthz`)  
+- Simple web-based status page  
+
+---
+
+## Prerequisites
+
+- Python 3.11+  
+- Docker & Docker Compose  
+- AWS CLI configured with access to ECR and EC2  
+- Terraform 1.5+  
+
+---
+
+## Local Setup
+
+### Without Docker
+
 git clone https://github.com/yourname/uptime-monitor.git
 cd uptime-monitor
-
-1.2. Run without Docker
 
 python -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
+
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
-Open http://localhost:8000
-🐳 2. Local with Docker Compose
+Access the application at:
+
+http://localhost:8000
+
+With Docker Compose
 
 make up
 
-Then:
+Access the services:
 
     Status page: http://localhost:8000
 
@@ -90,17 +140,17 @@ curl -X POST http://localhost:8000/targets \
   -H 'Content-Type: application/json' \
   -d '{"url":"https://example.com","interval_seconds":15,"enabled":true}'
 
-☁️ 3. AWS Deployment with Terraform
-3.1. Initialize Terraform
+AWS Deployment with Terraform
+Initialize Terraform
 
 cd terraform
 terraform init
 
-3.2. Create infrastructure
+Create Infrastructure
 
 terraform apply -var "key_name=YOUR_EC2_KEYPAIR_NAME"
 
-Terraform outputs will provide:
+Terraform outputs:
 
     ecr_repository_url
 
@@ -108,52 +158,52 @@ Terraform outputs will provide:
 
     ec2_public_ip
 
-📦 4. Build & Push Docker Image to ECR
-4.1. Authenticate to ECR
+Build and Push Docker Image to ECR
+Authenticate to ECR
 
 aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <ecr_repository_url>
 
-4.2. Build & push
+Build and Push
 
 docker build -t <ecr_repository_url>:latest .
 docker push <ecr_repository_url>:latest
 
-The EC2 instance will automatically pull the latest image and run it on port 80.
-🔄 5. CI/CD with GitHub Actions
+The EC2 instance automatically pulls the latest image and runs the application on port 80.
+CI/CD with GitHub Actions
 
     Push the project to GitHub.
 
-    In Settings → Secrets, add:
+    Add repository secrets:
 
-        AWS_REGION
+    AWS_REGION
 
-        AWS_ROLE_TO_ASSUME (or AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY)
+    AWS_ROLE_TO_ASSUME (or AWS_ACCESS_KEY_ID + AWS_SECRET_ACCESS_KEY)
 
-        ECR_REPOSITORY (e.g., 123456789012.dkr.ecr.eu-central-1.amazonaws.com/uptime-monitor)
+    ECR_REPOSITORY (e.g., 123456789012.dkr.ecr.eu-central-1.amazonaws.com/uptime-monitor)
 
-    Every push to main will:
+Every push to the main branch will:
 
-        Build the Docker image
+    Build the Docker image
 
-        Push it to ECR
+    Push the image to ECR
 
-🛠 6. Updating the Application
+Updating the Application
 
-Push a new latest image and on the EC2 instance run:
+Push the new Docker image and restart the service on the EC2 instance:
 
 sudo systemctl restart uptime-monitor.service
 
-🗑 7. Destroy Infrastructure
+Destroying Infrastructure
 
 cd terraform
 terraform destroy
 
-🔮 Possible Extensions
+Recommended Extensions
 
-    ECS/Fargate + ALB + Route53
+    Deploy with ECS/Fargate using ALB and Route53
 
-    Grafana + Prometheus stack in docker-compose
+    Integrate Grafana + Prometheus via Docker Compose
 
-    Slack/Webhook alerts
+    Enable Slack/Webhook notifications for downtime alerts
 
-    RDS (PostgreSQL/MySQL) instead of SQLite
+    Use RDS (PostgreSQL/MySQL) instead of SQLite for production persistence
