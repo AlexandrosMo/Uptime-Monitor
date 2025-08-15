@@ -58,7 +58,7 @@ uptime-monitor/
 
 │ └── workflows/
 
-│ ├── ci-cd.yml
+│   ├── ci-cd.yml
 
 
 ---
