@@ -32,6 +32,8 @@ uptime-monitor/
 
 │ └── templates/
 
+│   ├── status.html    
+
 ├── requirements.txt
 
 ├── Dockerfile
@@ -52,7 +54,11 @@ uptime-monitor/
 
 │ └── user_data.sh
 
-└── .github/workflows/ci-cd.yml
+└── .github/
+
+│ └── workflows/
+
+│ ├── ci-cd.yml
 
 
 ---
