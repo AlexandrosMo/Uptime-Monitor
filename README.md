@@ -1,254 +1,130 @@
-# 🚀 Uptime Monitor — DevOps Hands‑On Project
+# Uptime Monitor — Technical Documentation
 
-A **FastAPI** application that monitors URLs, stores results in **SQLite**, and exposes:
+## Overview
 
-* `/` — HTML status page
-* `/targets` — REST API for managing monitored URLs
-* `/metrics` — Prometheus metrics
-* `/healthz` — Health check
+Uptime Monitor is a Python-based application built with FastAPI for monitoring the availability and response times of specified URLs. The application stores monitoring results in an SQLite database and exposes key functionalities through a REST API, Prometheus-compatible metrics, and a web-based status page.
 
-Built as a **full DevOps project**:
+## Features
 
-* Multi‑stage Dockerfile
-* `docker-compose` for local development
-* Terraform for AWS (ECR + EC2 + IAM + Security Group)
-* GitHub Actions CI/CD for building & pushing to ECR
+* Monitor multiple URLs at configurable intervals.
+* Store monitoring results in SQLite (can be adapted to RDS for production).
+* Serve Prometheus metrics via `/metrics` endpoint.
+* Provide a health check endpoint at `/healthz`.
+* Display results through an HTML status page.
 
----
+## Endpoints
 
-## 📦 Features
+* `/` — HTML status page.
+* `/targets` — Manage monitored URLs (CRUD operations).
+* `/metrics` — Prometheus metrics.
+* `/healthz` — Health check endpoint.
 
-* Monitor multiple URLs with configurable intervals
-* Store check results in SQLite (swap to RDS for production if you prefer)
-* Prometheus‑compatible metrics (`/metrics`)
-* Health check endpoint (`/healthz`)
-* Simple web‑based status page (`/`)
+## Prerequisites
 
----
+* Python 3.11 or higher.
+* Docker and Docker Compose.
+* AWS CLI configured for ECR and EC2.
+* Terraform version 1.5 or higher.
 
-## 🧭 Endpoints
+## Installation and Usage
 
-| Method | Path            | Description             |
-| -----: | --------------- | ----------------------- |
-|    GET | `/`             | HTML status page        |
-|    GET | `/healthz`      | Health check            |
-|    GET | `/metrics`      | Prometheus metrics      |
-|    GET | `/targets`      | List monitored targets  |
-|   POST | `/targets`      | Add/enable a target     |
-|    PUT | `/targets/{id}` | Update a target         |
-| DELETE | `/targets/{id}` | Disable/remove a target |
+### Local Installation (without Docker)
 
-> Exact request/response shapes live in the FastAPI docs at `/docs` when the app is running.
-
----
-
-## 📂 Project Structure
-
-```text
-uptime-monitor/
-├── app/
-│   ├── __init__.py
-│   ├── main.py
-│   ├── db.py
-│   ├── monitor.py
-│   ├── models.py
-│   └── templates/
-│       └── status.html
-├── requirements.txt
-├── Dockerfile
-├── docker-compose.yml
-├── Makefile
-├── terraform/
-│   ├── provider.tf
-│   ├── variables.tf
-│   ├── outputs.tf
-│   ├── main.tf
-│   └── user_data.sh
-└── .github/
-    └── workflows/
-        └── ci-cd.yml
-```
-
----
-
-## ✅ Prerequisites
-
-* Python **3.11+**
-* Docker & Docker Compose
-* AWS CLI configured with permissions for ECR and EC2
-* Terraform **1.5+**
-
----
-
-## 🖥 Local Development
-
-### 1) Without Docker
+1. Clone the repository:
 
 ```bash
-# Clone
-git clone https://github.com/AlexandrosMo/uptime-monitor.git
+git clone https://github.com/yourname/uptime-monitor.git
 cd uptime-monitor
+```
 
-# Create and activate venv (Linux/Mac)
+2. Create and activate a virtual environment:
+
+```bash
 python -m venv .venv
-source .venv/bin/activate
+source .venv/bin/activate  # For Linux/Mac
+.venv\Scripts\activate     # For Windows
+```
 
-# Install deps
+3. Install dependencies:
+
+```bash
 pip install -r requirements.txt
+```
 
-# Run dev server
+4. Start the application:
+
+```bash
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-**Windows (PowerShell):**
+5. Access the application at [http://localhost:8000](http://localhost:8000).
 
-```powershell
-python -m venv .venv
-.\.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
+### Using Docker Compose
 
-**Windows (Git Bash one‑liner):**
-
-```bash
-python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt && uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-```
-
-Access the app: [http://localhost:8000](http://localhost:8000)
-
-### 2) With Docker Compose
-
-Using `make` (recommended):
-
-```bash
-make up      # build & start in background
-make logs    # tail logs
-make down    # stop
-```
-
-Or directly with Docker Compose:
+1. Build and run containers:
 
 ```bash
 docker compose up -d --build
 ```
 
-Access the services:
+2. Access services:
 
-* Status page: [http://localhost:8000](http://localhost:8000)
-* Health check: [http://localhost:8000/healthz](http://localhost:8000/healthz)
-* Metrics: [http://localhost:8000/metrics](http://localhost:8000/metrics)
+   * Status page: [http://localhost:8000](http://localhost:8000)
+   * Health check: [http://localhost:8000/healthz](http://localhost:8000/healthz)
+   * Metrics: [http://localhost:8000/metrics](http://localhost:8000/metrics)
 
-Add a monitored URL:
+## AWS Deployment (with Terraform)
 
-```bash
-curl -X POST http://localhost:8000/targets \
-  -H 'Content-Type: application/json' \
-  -d '{"url":"https://example.com","interval_seconds":15,"enabled":true}'
-```
-
----
-
-## ☁️ AWS Deployment with Terraform
-
-### Initialize Terraform
+1. Initialize Terraform:
 
 ```bash
 cd terraform
 terraform init
 ```
 
-### Create Infrastructure
+2. Apply configuration:
 
 ```bash
-terraform apply -var "key_name=YOUR_EC2_KEYPAIR_NAME" -auto-approve
+terraform apply -var "key_name=YOUR_EC2_KEYPAIR_NAME"
 ```
 
-**Terraform outputs** (examples):
+3. Terraform will output:
 
-* `ecr_repository_url`
-* `app_url` (EC2 public URL)
-* `ec2_public_ip`
+   * ECR repository URL
+   * Application public URL
+   * EC2 public IP
 
-> `user_data.sh` installs Docker on EC2, logs in to ECR, pulls the image, and starts the app via systemd service `uptime-monitor.service` listening on port **80**.
+## Docker Image Management
 
----
-
-## 📦 Build & Push Docker Image to ECR
-
-Authenticate to ECR:
+Authenticate with ECR:
 
 ```bash
-aws ecr get-login-password --region <region> | \
-  docker login --username AWS --password-stdin <ecr_repository_url>
+aws ecr get-login-password --region <region> | docker login --username AWS --password-stdin <ecr_repository_url>
 ```
 
-Build & push:
+Build and push image:
 
 ```bash
 docker build -t <ecr_repository_url>:latest .
 docker push <ecr_repository_url>:latest
 ```
 
-The EC2 instance started by Terraform will pull the latest `:latest` image and run the application on port **80**.
+## CI/CD
 
-> Tip: also tag with a git SHA for traceability, e.g. `:abc123`.
+A GitHub Actions workflow (`.github/workflows/ci-cd.yml`) builds and pushes the Docker image to ECR on each push to the `main` branch.
 
----
+## Infrastructure Teardown
 
-## 🤖 CI/CD with GitHub Actions
-
-1. Push this project to GitHub.
-2. Add repository **secrets** (Settings → Secrets and variables → Actions):
-
-   * `AWS_REGION`
-   * `AWS_ROLE_TO_ASSUME` *(preferred, via OIDC)* **or** `AWS_ACCESS_KEY_ID` + `AWS_SECRET_ACCESS_KEY`
-   * `ECR_REPOSITORY` (e.g., `123456789012.dkr.ecr.eu-central-1.amazonaws.com/uptime-monitor`)
-3. The workflow `.github/workflows/ci-cd.yml` builds the image and pushes to ECR on every push to `main`.
-
----
-
-## 🔄 Updating the Application
-
-Push a new Docker image to ECR. The EC2 instance can be restarted to pull latest:
-
-```bash
-ssh ec2-user@<ec2_public_ip>
-sudo systemctl restart uptime-monitor.service
-```
-
-> Alternatively, use an Instance Profile + EventBridge or a simple pull‑on‑schedule if you prefer hands‑off.
-
----
-
-## 🧹 Destroying Infrastructure
+To remove all AWS resources:
 
 ```bash
 cd terraform
-terraform destroy -auto-approve
+terraform destroy
 ```
 
----
+## Potential Enhancements
 
-## 🧪 Makefile Targets (optional)
-
-Common targets used by this repo:
-
-```Makefile
-up:           ## build & start docker compose
-	docker compose up -d --build
-
-down:         ## stop containers
-	docker compose down
-
-logs:         ## tail app logs
-	docker compose logs -f --tail=100
-
-fmt:          ## format Python code (if black is in requirements)
-	black app
-
-lint:         ## lint (if ruff/flake8 in requirements)
-	ruff check app || true
-```
-
-
+* ECS/Fargate deployment with load balancing.
+* Grafana and Prometheus integration.
+* Slack or webhook notifications for downtime.
+* Migration from SQLite to RDS for production use.
