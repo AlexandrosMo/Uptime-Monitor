@@ -1,0 +1,23 @@
+version: "3.9"
+services:
+  uptime:
+    build: .
+    image: uptime-monitor:local
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - DB_PATH=/data/uptime.db
+      - CHECKER_SCAN_INTERVAL=5
+      - HTTP_TIMEOUT=10
+      - LOG_LEVEL=INFO
+    volumes:
+      - uptime_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8000/healthz"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 10s
+volumes:
+  uptime_data:
