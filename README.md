@@ -17,23 +17,41 @@ Built as a **full DevOps project**:
 ## 📂 Project Structure
 
 uptime-monitor/
+
 ├── app/
+
 │ ├── init.py
+
 │ ├── main.py
+
 │ ├── db.py
+
 │ ├── monitor.py
+
 │ ├── models.py
+
 │ └── templates/
+
 ├── requirements.txt
+
 ├── Dockerfile
+
 ├── docker-compose.yml
+
 ├── Makefile
+
 ├── terraform/
+
 │ ├── provider.tf
+
 │ ├── variables.tf
+
 │ ├── outputs.tf
+
 │ ├── main.tf
+
 │ └── user_data.sh
+
 └── .github/workflows/ci-cd.yml
 
 
