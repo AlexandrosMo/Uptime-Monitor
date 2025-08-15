@@ -86,7 +86,7 @@ uptime-monitor/
 
 ```bash
 # Clone
-git clone https://github.com/yourname/uptime-monitor.git
+git clone https://github.com/AlexandrosMo/uptime-monitor.git
 cd uptime-monitor
 
 # Create and activate venv (Linux/Mac)
