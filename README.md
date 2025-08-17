@@ -78,4 +78,8 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 ## Contributing
 
-Contributions are welcome! Please open issues or pull requests via
+Contributions are welcome! Please open issues or pull requests via [GitHub Issues](https://github.com/AlexandrosMo>/uptime-monitor/issues) or by submitting a [Pull Request](https://github.com/AlexandrosMo>/uptime-monitor/pulls).
+
+Please follow the project's coding standards and ensure all tests pass before submitting.
+
+For major changes, open an issue first to discuss your
