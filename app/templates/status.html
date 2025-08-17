@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Uptime Monitor</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid black; padding: 5px; text-align: center; }
+        .ok { background-color: #c8f7c5; }
+        .fail { background-color: #f7c5c5; }
+    </style>
+</head>
+<body>
+<h1>Uptime Monitor</h1>
+<table>
+    <tr>
+        <th>ID</th><th>URL</th><th>Last Check</th><th>Status Code</th><th>Latency (ms)</th><th>OK</th><th>Error</th>
+    </tr>
+    {% for row in rows %}
+    <tr class="{{ 'ok' if row['ok'] else 'fail' }}">
+        <td>{{ row['id'] }}</td>
+        <td>{{ row['url'] }}</td>
+        <td>{{ row['ts_utc'] or '-' }}</td>
+        <td>{{ row['status_code'] or '-' }}</td>
+        <td>{{ row['latency_ms'] or '-' }}</td>
+        <td>{{ row['ok'] }}</td>
+        <td>{{ row['error'] or '-' }}</td>
+    </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

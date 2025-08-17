@@ -15,6 +15,9 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     CHECKER_SCAN_INTERVAL=5 \
     HTTP_TIMEOUT=10 \
     LOG_LEVEL=INFO
+    
+WORKDIR /app
+RUN mkdir -p db
 
 RUN adduser --disabled-password --gecos "app" app && mkdir -p /data && chown -R app:app /data
 COPY --from=build /wheels /wheels
